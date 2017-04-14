@@ -1,0 +1,6 @@
+c:\users\ruben\documents\visual studio 2015\Projects\Pan Language\Pan Language\bin\Debug\Pan Language.exe.config
+c:\users\ruben\documents\visual studio 2015\Projects\Pan Language\Pan Language\bin\Debug\Pan Language.exe
+c:\users\ruben\documents\visual studio 2015\Projects\Pan Language\Pan Language\bin\Debug\Pan Language.pdb
+c:\users\ruben\documents\visual studio 2015\Projects\Pan Language\Pan Language\obj\Debug\Pan Language.csprojResolveAssemblyReference.cache
+c:\users\ruben\documents\visual studio 2015\Projects\Pan Language\Pan Language\obj\Debug\Pan Language.exe
+c:\users\ruben\documents\visual studio 2015\Projects\Pan Language\Pan Language\obj\Debug\Pan Language.pdb
