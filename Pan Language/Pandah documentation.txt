@@ -21,4 +21,42 @@ A main function looks like this:
 
 	}
 
-The fist thing that should stand out is the use if the keyword "function".
+The fist thing that should stand out is the use of the "function" keyword.
+After the function comes the identifier. This identifier is used to locate the function.
+Next comes the assignment operator. 
+When used on a function this operator tells the function what parameters its getting.
+The "Main" function doesnt get any args by default so we give it void (nothing).
+When put together the program should now look like this:
+
+	class Program
+	{
+		function Main <- void
+		{
+		
+		}
+	}
+	
+Now that we've got the basic setup of a Pandah program we can start the actual programming part.
+The easiest way to print a string in Pandah is by using the "print" statement
+This is how the print statment works:
+	
+	print(message);
+	
+as you can see we can print out "Hello World" by doing
+
+	print("Hello World")
+
+like other languages text is written between double apostrophe's
+We can now create our final Hello World program:
+
+	class Program
+	{
+		function Main <- void
+		{
+			print("Hello World");
+		}
+	}
+
+when interpreted you should get the output: Hello World!
+
+Chapter 2: TODO: CHAPTER 2
