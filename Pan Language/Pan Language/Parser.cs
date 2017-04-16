@@ -68,7 +68,6 @@ namespace Pan_Language
             Method m = new Method(functionName.Value, _tokenCount + 3);                             //store the method found in a method class
             Match(new Token(TokenType.OPERATOR, "<-"));                                             //make sure there is a <- 
             ParseMethodParams(m);                                                                   //parse all the method parameters
-            Match(new Token(TokenType.SYMBOL, ";"));                                                //make sure there's an ;
             Match(new Token(TokenType.SYMBOL, "{"));                                                //make sure there's an {
             m.MethodIndex = _tokenCount;                                                            //store the current tokencount in the method class for later use
             Match(new Token(TokenType.SYMBOL, "}"));                                                //make sure there's an }
@@ -144,9 +143,7 @@ namespace Pan_Language
         private void ParsePrintStatement()
         {
             Match(new Token(TokenType.KEYWORD, "print"));               //make sure the next token is print keyword
-            Match(new Token(TokenType.SYMBOL, "("));                    //make sure the next token is (
             ParseExpression();                                          //parse the expression to be printed
-            Match(new Token(TokenType.SYMBOL, ")"));                    //make sure there's a )
             Console.WriteLine("Print: {0}", _codeGenerator.STACK.Pop());//write the first thing on the stack in the console
             Match(new Token(TokenType.SYMBOL, ";"));                    //make ssure there's a ;
         }
