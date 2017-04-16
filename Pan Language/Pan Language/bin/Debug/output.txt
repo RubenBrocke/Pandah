@@ -9,7 +9,8 @@ public static Stack<object> STACK = new Stack<object>();
 public static int TEMP1;
     static void Main(string[] args)
     {
-STACK.Push("Hello World");
+STACK.Push(True);
+ifSTACK.Push("Hello World");
     }
   }
 }

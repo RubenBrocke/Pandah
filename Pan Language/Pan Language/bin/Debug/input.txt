@@ -1,7 +1,13 @@
 class Program
 {
+
+	let isTrue <- true;
+
 	function Main <- void
 	{
-		print "Hello World";
+		if (isTrue)
+		{
+			print "Hello World";
+		}
 	}
 }
