@@ -248,7 +248,7 @@ namespace Pan_Language
             {
                 ParseStatements();                              //parse everything in the if statement
             }
-            Match(new Token(TokenType.SYMBOL, "}"));            //make sure there's a }
+            MatchWhile(new Token(TokenType.SYMBOL, "}"));            //make sure there's a }
         }
 
         private void ParseWhileStatement()
@@ -503,7 +503,7 @@ namespace Pan_Language
             {
                 while (PeekToken().Value != T.Value)
                 {
-                    Console.WriteLine("Searching for: {0} Got: {1}", T.Value, PeekToken().Value);
+                    //Console.WriteLine("Searching for: {0} Got: {1}", T.Value, PeekToken().Value);
                     _tokenCount++;
                 }
                 _tokenCount++;

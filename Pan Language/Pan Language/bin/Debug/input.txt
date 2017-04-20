@@ -1,8 +1,8 @@
 class Program
 {
-	let isTrue <- true;
+	let isTrue <- false;
 
-	function Main <- void
+	function Main <- void;
 	{
 		if (isTrue)
 		{

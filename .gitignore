@@ -61,3 +61,10 @@ Pan Language/Pan Language/bin/Debug/Pan Language.exe
 Pan Language/Pan Language/obj/Debug/Pan Language.exe
 Pan Language/.vs/Pan Language/v15/.suo
 Pan Language/Pan Language/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+*.suo
+Pan Language/Pan Language/bin/Debug/Pan Language.exe
+*.pdb
+Pan Language/Pan Language/bin/Output only/Pan Language.vshost.exe.manifest
+*.txt
+*.cache
+Pan Language/Pan Language/obj/Debug/Pan Language.csprojResolveAssemblyReference.cache
