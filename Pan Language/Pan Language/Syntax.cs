@@ -5,7 +5,7 @@ namespace Pan_Language
     public static class Syntax
     {
 
-        private static readonly List<string> KeyWords = new List<string> { "if", "else", "function", "true", "false", "null", "this", "int", "string", "let", "class", "exec", "print", "void", "while" };
+        private static readonly List<string> KeyWords = new List<string> { "if", "else", "function", "true", "false", "null", "this", "int", "string", "let", "class", "exec", "print", "void", "while", "input" };
         private static readonly List<char> Operators = new List<char> { '+', '-', '*', '/', '%', '<', '>', '=', '!', '&', '|', '?', ';' };
         private static readonly List<char> Symbols = new List<char> { '{', '}', '(', ')', ':', ',' };
 

@@ -1,15 +1,7 @@
 class Program
 {
-	let thing <- "Hello World";
-	let number <- 1;
-
 	function Main <- void;
 	{
-		while (number < 500)
-		{
-			let number <- number + 1;
-			print(number);
-		}
-		print("Finished");
+		print "Hello World";
 	}
 }

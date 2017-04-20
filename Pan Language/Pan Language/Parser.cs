@@ -40,7 +40,7 @@ namespace Pan_Language
             Match(new Token(TokenType.SYMBOL, "{"));                
             ParseLocalVarDecl();                                                        //parse all the local variable declaration
             ParseSubDecls();                                                            //parse the sub declaration of all the other functions
-            Match(new Token(TokenType.SYMBOL, "}"));    
+            MatchWhile(new Token(TokenType.SYMBOL, "}"));    
             if (_currentClass.HasMethod("Main"))                                        //if there's a main class run it
             {
                 _tokenCount = _currentClass.GetMethod("Main").MethodIndex;              //set the tokencount to the beginning of the main function
@@ -68,10 +68,10 @@ namespace Pan_Language
             Method m = new Method(functionName.Value, _tokenCount + 3);                             //store the method found in a method class
             Match(new Token(TokenType.OPERATOR, "<-"));                                             //make sure there is a <- 
             ParseMethodParams(m);                                                                   //parse all the method parameters
-            Match(new Token(TokenType.SYMBOL, ";"));                                                //make sure there's an ;
+            Match(new Token(TokenType.OPERATOR, ";"));                                                //make sure there's an ;
             Match(new Token(TokenType.SYMBOL, "{"));                                                //make sure there's an {
             m.MethodIndex = _tokenCount;                                                            //store the current tokencount in the method class for later use
-            Match(new Token(TokenType.SYMBOL, "}"));                                                //make sure there's an }
+            MatchWhile(new Token(TokenType.SYMBOL, "}"));                                           //make sure there's an }
             _currentClass.ClassMethods.Add(m);                                                      //add the method to the current class for later use
         }
 
@@ -138,17 +138,33 @@ namespace Pan_Language
                 case "while":               //its a while statement
                     ParseWhileStatement();  //parse it
                     break;
+                case "input":
+                    ParseInputStatement();
+                    break;
             }
+        }
+
+        private void ParseInputStatement()
+        {
+            Match(new Token(TokenType.KEYWORD, "input"));
+            if (PeekToken().Type != TokenType.IDENTIFIER)
+            {
+                throw new CompilerException("Cant store input in: " + PeekToken().Value);
+            }
+            Token ident = NextToken();
+            _codeGenerator.STACK.Push(Console.ReadLine());
+            Console.WriteLine("Input" + ident.Value);
+            _codeGenerator.Assign(ident, _currentClass, _currentMethod);
+            Match(new Token(TokenType.OPERATOR, ";"));
+
         }
 
         private void ParsePrintStatement()
         {
             Match(new Token(TokenType.KEYWORD, "print"));               //make sure the next token is print keyword
-            Match(new Token(TokenType.SYMBOL, "("));                    //make sure the next token is (
             ParseExpression();                                          //parse the expression to be printed
-            Match(new Token(TokenType.SYMBOL, ")"));                    //make sure there's a )
             Console.WriteLine("Print: {0}", _codeGenerator.STACK.Pop());//write the first thing on the stack in the console
-            Match(new Token(TokenType.SYMBOL, ";"));                    //make ssure there's a ;
+            Match(new Token(TokenType.OPERATOR, ";"));                    //make ssure there's a ;
         }
 
         private void ParseFunctionCall()
@@ -172,7 +188,7 @@ namespace Pan_Language
                 throw new CompilerException("Function not existent");           //if there's no known function throw an error
             }
             _tokenCount = returnStack.Pop();                                    //return tho before you executed the function
-            Match(new Token(TokenType.SYMBOL, ";"));                            //make sure the function call ends with a ;
+            Match(new Token(TokenType.OPERATOR, ";"));                            //make sure the function call ends with a ;
             _currentMethod = null;                                              //set the current method to null because we arent in one anymore FIXME: dont set it to null
         }
 
@@ -481,14 +497,14 @@ namespace Pan_Language
             return false;
         }
 
-        private bool Match(Token T)
+        private bool MatchWhile(Token T)
         {
             try
             {
                 while (PeekToken().Value != T.Value)
                 {
+                    Console.WriteLine("Searching for: {0} Got: {1}", T.Value, PeekToken().Value);
                     _tokenCount++;
-                    Console.WriteLine("Searching for: {0}", T.Value);
                 }
                 _tokenCount++;
                 return true;
@@ -497,6 +513,16 @@ namespace Pan_Language
             {
                 throw new CompilerException("Are you missing a " + T.Value);
             }
+        }
+
+        private bool Match(Token T)
+        {
+            if (PeekToken().Value != T.Value || PeekToken().Type != T.Type)
+            {
+                throw new CompilerException("Expected: " + T.Value + " Got: " + PeekToken().Value);
+            }
+            _tokenCount++;
+            return true;
         }
     }
 }
