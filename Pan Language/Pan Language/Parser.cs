@@ -37,10 +37,10 @@ namespace Pan_Language
             Class c = new Class(classIdentifier.Value);                                 //create a new class based on the class token
             _currentClass = c;                                                          //set it as the current class
             Variable.Classes.Add(c);                                                    //add the class to the variable list (to become namespace)
-            Match(new Token(TokenType.SYMBOL, "{"));                
+            //Match(new Token(TokenType.SYMBOL, "{"));                
             ParseLocalVarDecl();                                                        //parse all the local variable declaration
             ParseSubDecls();                                                            //parse the sub declaration of all the other functions
-            MatchWhile(new Token(TokenType.SYMBOL, "}"));    
+            MatchWhile(new Token(TokenType.KEYWORD, "end"));    
             if (_currentClass.HasMethod("Main"))                                        //if there's a main class run it
             {
                 _tokenCount = _currentClass.GetMethod("Main").MethodIndex;              //set the tokencount to the beginning of the main function
@@ -69,9 +69,9 @@ namespace Pan_Language
             Match(new Token(TokenType.OPERATOR, "<-"));                                             //make sure there is a <- 
             ParseMethodParams(m);                                                                   //parse all the method parameters
             Match(new Token(TokenType.OPERATOR, ";"));                                                //make sure there's an ;
-            Match(new Token(TokenType.SYMBOL, "{"));                                                //make sure there's an {
+            //Match(new Token(TokenType.SYMBOL, "{"));                                                //make sure there's an {
             m.MethodIndex = _tokenCount;                                                            //store the current tokencount in the method class for later use
-            MatchWhile(new Token(TokenType.SYMBOL, "}"));                                           //make sure there's an }
+            MatchWhile(new Token(TokenType.KEYWORD, "end"));                                           //make sure there's an }
             _currentClass.ClassMethods.Add(m);                                                      //add the method to the current class for later use
         }
 
@@ -108,7 +108,7 @@ namespace Pan_Language
 
         private void ParseStatements()
         {
-            while (PeekToken().Value != "}")    //check to see if the next token is a }  keep going as long as it is
+            while (PeekToken().Value != "end")    //check to see if the next token is a }  keep going as long as it is
             {
                 ParseStatement();               //the next token is not a } parse the statment comming up next
             }
@@ -177,7 +177,7 @@ namespace Pan_Language
             Match(new Token(TokenType.SYMBOL, ")"));                            //make sure the next token is a )
             returnStack.Push(_tokenCount);                                      //push the current tokencount in a stack
             if (_currentClass.HasMethod(functionName.Value))                    //check to see if the method exists in the current class
-            {                                                           
+            {
                 Method m = _currentClass.GetMethod(functionName.Value);         //store the method in a variable for later use
                 _currentMethod = m;                                             //set the current method to the executing method
                 _tokenCount = m.MethodIndex;                                    //set the token count the beginning of the method                      
@@ -196,7 +196,7 @@ namespace Pan_Language
         {
             int argscounter = 0;                                                                    //set the argument counter to 0
             while (PeekToken().Value != ")")                                                        //check if the next token is a )
-            {   
+            {
                 ParseExpression();                                                                  //parse the expression (parameter)
                 m.Params[m.Params.ElementAt(argscounter).Key].Value = _codeGenerator.STACK.Pop();   //store it in the param list of the method
                 argscounter++;                                                                      //increment the argument counter
@@ -222,7 +222,7 @@ namespace Pan_Language
             else if (_currentMethod != null)                                                        //Check if we're in a method
             {
                 if (!_currentMethod.HasVariable(varName.Value))                                     //check if the current method has the variable
-                {                    
+                {
                     _currentMethod.MethodVars.Add(varName.Value, new Variable(null));               //there's no variable in the currentclass nor in the method. we should add it
                 }
             }
@@ -243,12 +243,12 @@ namespace Pan_Language
             ParseExpression();                                  //parse the if expression
             _codeGenerator.BeginIf();                           //tell the code gen an if is beginning
             Match(new Token(TokenType.SYMBOL, ")"));            //make sure there's a )
-            Match(new Token(TokenType.SYMBOL, "{"));            //make sure there's a {
+            //Match(new Token(TokenType.SYMBOL, "{"));            //make sure there's a {
             if (Convert.ToBoolean(_codeGenerator.STACK.Pop()))  //check if the if expression is true or false
             {
                 ParseStatements();                              //parse everything in the if statement
             }
-            MatchWhile(new Token(TokenType.SYMBOL, "}"));            //make sure there's a }
+            MatchWhile(new Token(TokenType.KEYWORD, "end"));            //make sure there's a }
         }
 
         private void ParseWhileStatement()
@@ -258,16 +258,16 @@ namespace Pan_Language
             int returnCount = _tokenCount;                      //store the current token count
             ParseExpression();                                  //parse the while expression
             Match(new Token(TokenType.SYMBOL, ")"));            //make sure there's a )
-            Match(new Token(TokenType.SYMBOL, "{"));            //make sure there's a {
+            //Match(new Token(TokenType.SYMBOL, "{"));            //make sure there's a {
             while(Convert.ToBoolean(_codeGenerator.STACK.Pop()))//keep the while loop going as long as there's true on top of the stack
             {
                 ParseStatements();                              //parse the statment in the while loop
                 _tokenCount = returnCount;                      //set the tokencount back to the expression in the while loop
                 ParseExpression();                              //parse that expression again
                 Match(new Token(TokenType.SYMBOL, ")"));        //make sure there's a ) (again)
-                Match(new Token(TokenType.SYMBOL, "{"));        //make sure there's a { (again)
+                //Match(new Token(TokenType.SYMBOL, "{"));        //make sure there's a { (again)
             }
-            Match(new Token(TokenType.SYMBOL, "}"));            //make sure it ends with a }
+            Match(new Token(TokenType.KEYWORD, "end"));            //make sure it ends with a }
         }
 
         private void ParseExpression()
@@ -278,7 +278,7 @@ namespace Pan_Language
                 Token logOp = NextToken();                      //store the operator for later use
                 ParseRelExpression();                           //parse the relative expression after the logic operator
                 switch (logOp.Value)                            //switch all the posibilities 
-                {   
+                {
                     case "&":                                   //in case of &
                         _codeGenerator.And();                   //tell the code gen there's an and operator
                         break;
