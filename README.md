@@ -8,6 +8,7 @@ this is is done by typing "class Program" in the first line.
 like many other languages the class and its name is followed by 2 brackets.
 the positioning of these brackets are completely left to the user.
 An example:
+
 	class Program
 	{
 
@@ -17,6 +18,7 @@ This example uses the backets on a new line.
 
 As said before the next thing a default pandah program has is a main function.
 A main function looks like this:
+
 	function Main <- void
 	{
 
