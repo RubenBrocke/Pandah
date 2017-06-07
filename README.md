@@ -5,14 +5,12 @@ Chapter 1. Hello World
 A pandah program always starts itself in the "Main" function of the "Program" class.
 to create a running program one should first create this Program class.
 this is is done by typing "class Program" in the first line.
-like many other languages the class and its name is followed by 2 brackets.
-the positioning of these brackets are completely left to the user.
+like some other languages the class and its name is followed by an "end"
 An example:
 
 	class Program
-	{
 
-	}
+	end
 
 This example uses the backets on a new line.
 
@@ -20,9 +18,8 @@ As said before the next thing a default pandah program has is a main function.
 A main function looks like this:
 
 	function Main <- void
-	{
 
-	}
+	end
 
 The fist thing that should stand out is the use of the "function" keyword.
 After the function comes the identifier. This identifier is used to locate the function.
@@ -32,33 +29,29 @@ The "Main" function doesnt get any args by default so we give it void (nothing).
 When put together the program should now look like this:
 
 	class Program
-	{
-		function Main <- void
-		{
-		
-		}
-	}
+		function Main <- void;
 	
-Now that we've got the basic setup of a Pandah program we can start the actual programming part.
+		end
+	end
+	
+Now that we've got the basic setup of a Pandah program we can start the actual programming part!
 The easiest way to print a string in Pandah is by using the "print" statement
 This is how the print statment works:
 	
-	print(message);
+	print message
 	
 as you can see we can print out "Hello World" by doing
 
-	print("Hello World")
+	print "Hello World"
 
 like other languages text is written between double apostrophe's
 We can now create our final Hello World program:
 
 	class Program
-	{
-		function Main <- void
-		{
-			print("Hello World");
-		}
-	}
+		function Main <- void;
+			print "Hello World"
+		end
+	end
 
 when interpreted you should get the output: Hello World!
 
@@ -67,10 +60,12 @@ Chapter 2: Fundamentals
 **Statements**
 Everything you do in pandah is started with a statement keyword.
 These statement keywords are:
+
 	let
 	exec
 	init
 	print
+	(more to come)
 
 **Let keyword**
 The let keyword is used to change the value of a variable and is used like this:
