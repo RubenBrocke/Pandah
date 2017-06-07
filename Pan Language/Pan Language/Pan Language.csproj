@@ -49,6 +49,7 @@
     <Compile Include="Class.cs" />
     <Compile Include="CodeGenerator.cs" />
     <Compile Include="CompilerException.cs" />
+    <Compile Include="Global.cs" />
     <Compile Include="ICodeGenerator.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Method.cs" />

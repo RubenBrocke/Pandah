@@ -122,7 +122,14 @@ namespace Pan_Language
             _output.WriteLine("TEMP1 = STACK.Pop();");
             _output.WriteLine("STACK.Push(TEMP + STACK.Pop());");
             TEMP1 = STACK.Pop();
-            STACK.Push((int)TEMP1 + (int)STACK.Pop());
+            try
+            {
+                STACK.Push((int)TEMP1 + (int)STACK.Pop());
+            }
+            catch
+            {
+                STACK.Push((string)STACK.Pop() + (string)TEMP1);
+            }
         }
         public void Equal()
         {
@@ -130,7 +137,15 @@ namespace Pan_Language
             _output.WriteLine("TEMP1 = STACK.Pop();");
             _output.WriteLine("STACK.Push(TEMP == STACK.Pop());");
             TEMP1 = STACK.Pop();
-            STACK.Push((int)TEMP1 == (int)STACK.Pop());
+            if (TEMP1.GetType() == typeof(string))
+            {
+                string STRING = (string)TEMP1;
+                STACK.Push(STRING.Equals(STACK.Pop()));
+            }
+            else
+            {
+                STACK.Push(TEMP1 == STACK.Pop());
+            }
         }
         public void LessOrEqual()
         {
@@ -259,7 +274,7 @@ namespace Pan_Language
             else
             {
                 throw new CompilerException("Variable does not exist");
-            }       
+            }
         }
         public void Call(string className, string subroutineName) => Console.WriteLine("Function Call");  
         public void SetType(Token symbol) => Console.WriteLine("Set Type to: " + symbol.Value);

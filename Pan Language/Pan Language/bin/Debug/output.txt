@@ -9,8 +9,32 @@ public static Stack<object> STACK = new Stack<object>();
 public static int TEMP1;
     static void Main(string[] args)
     {
-STACK.Push(True);
-ifSTACK.Push("Hello World");
+STACK.Push("What is your name?");
+STACK.Push("Hello ");
+TEMP1 = STACK.Pop();
+STACK.Push(TEMP + STACK.Pop());
+STACK.Push(" How are you doing?");
+TEMP1 = STACK.Pop();
+STACK.Push(TEMP + STACK.Pop());
+STACK.Push("good");
+TEMP1 = STACK.Pop();
+STACK.Push(TEMP == STACK.Pop());
+ifSTACK.Push("Im glad to hear that!");
+STACK.Push("What is ");
+TEMP1 = STACK.Pop();
+STACK.Push(TEMP + STACK.Pop());
+STACK.Push(" up to?");
+TEMP1 = STACK.Pop();
+STACK.Push(TEMP + STACK.Pop());
+STACK.Push("That sounds like fun! will you teach me?");
+STACK.Push("yes");
+TEMP1 = STACK.Pop();
+STACK.Push(TEMP == STACK.Pop());
+ifSTACK.Push("no");
+TEMP1 = STACK.Pop();
+STACK.Push(TEMP == STACK.Pop());
+ifSTACK.Push("Aaawh why not?");
+STACK.Push("Thats too bad");
     }
   }
 }
