@@ -65,6 +65,7 @@ These statement keywords are:
 	exec
 	init
 	print
+	input
 	(more to come)
 
 **Let keyword**
@@ -99,6 +100,15 @@ The print keyword is used to print something to the screen and is used like this
 	print TOPRINT
 
 TOPRINT is the thing you want to print.
+
+**Input keyword** 
+The input keyword is the basic way of getting input from the use in Pandah.
+Just like C#'s Console.Readline it reads the input untill it recieves a newline.
+The input keyword is used like this:
+
+	input IDENTIFIER
+	
+the identifiet is the variable you want to store the input in
 
 TODO: think of more keywords
 
