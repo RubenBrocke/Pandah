@@ -1,6 +1,7 @@
 --Documentation for the Pandah language--
 
 Chapter 1. Hello World
+
 A pandah program always starts itself in the "Main" function of the "Program" class.
 to create a running program one should first create this Program class.
 this is is done by typing "class Program" in the first line.
