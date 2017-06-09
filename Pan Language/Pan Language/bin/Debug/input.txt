@@ -1,23 +1,17 @@
 class Program
 	function Main <- void
-		print	"What is your name?"
-		input	Name
-		print	"Hello " + Name + " How are you doing?"
-		input	inputText
-		if (inputText ? "good")
-			print "Im glad to hear that!"
-		end
-		print "What is " + Name + " up to?"
-		input UpTo
-		print "That sounds like fun! will you teach me?"
-		input yesNo
-		if (yesNo ? "yes")
-			print "Yey!"
-		end
-		if (yesNo ? "no")
-			print "Aaawh why not?"
-			input reason
-			print "Thats too bad"
+		if (false)
+			print "FAILED"
+		else
+			print "Succes!"
+			init me <- User
+			exec me.Test
 		end
 	end
+end
+
+class User
+	function Test <- void
+		print "TEST"
+	end	
 end

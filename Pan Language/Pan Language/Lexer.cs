@@ -44,8 +44,8 @@ namespace Pan_Language
                 string number = nextChar.ToString();
                 //Get the full number
                 number += EatWhile(Syntax.IsNumber);
-
-                if (!int.TryParse(number, out int result))
+                int result;
+                if (!int.TryParse(number, out result))
                 {
                     //Throw error number is too big
                     throw new CompilerException("Unable to parse number must be between 0-2147483648 but got: " + number + " At Token: " + _currentLine);

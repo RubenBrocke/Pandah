@@ -1,4 +1,6 @@
-﻿namespace Pan_Language
+﻿using System.Linq;
+
+namespace Pan_Language
 {
     internal class Token
     {

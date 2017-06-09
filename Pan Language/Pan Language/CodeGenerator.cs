@@ -20,7 +20,7 @@ namespace Pan_Language
             //Write Nesesarry code and initialization to the file
             EmitEnvironment();
             EmitBootstrapper();
-            ps.ParseClass();
+            ps.ParseClasses();
             EmitEnd();
         }
 

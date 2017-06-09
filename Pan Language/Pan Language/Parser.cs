@@ -12,6 +12,7 @@ namespace Pan_Language
         private Class _currentClass;                    //The class the parser is currently in cannot be null
         private Method _currentMethod;                  //The method the parser is currently in can be null
         private Stack<int> returnStack;                 //the stack that holds where the praser should go after a series of function calls
+        private int ProgramStartIndex;                  //the token where the program should start (class = program method = main)
 
         public Parser(List<Token> tokens, CodeGenerator codeGenerator)
         {
@@ -20,6 +21,21 @@ namespace Pan_Language
             _tokenCount = -1;                                       //start tokencount at 1 
             _codeGenerator = codeGenerator;                         //store the code generator for later use
             returnStack = new Stack<int>();                         //initialise the return stack
+        }
+
+        public void ParseClasses()
+        {
+            while (PeekToken().Type == TokenType.KEYWORD && PeekToken().Value == "class")
+            {
+                ParseClass();
+                if (_parseTokens[_tokenCount].Type == TokenType.NEWLINE)
+                {
+                    break;
+                }
+            }
+            _tokenCount = ProgramStartIndex;                                        //set the tokencount to the beginning of the main function
+            _currentMethod = _currentClass.GetMethod("Main");                       //set the current method to the main method
+            ParseStatements();                                                      //start the parsing process of main
         }
 
         public void ParseClass()
@@ -36,15 +52,14 @@ namespace Pan_Language
             Token classIdentifier = NextToken();                                        //store the identifier token
             Class c = new Class(classIdentifier.Value);                                 //create a new class based on the class token
             _currentClass = c;                                                          //set it as the current class
-            Global.Classes.Add(c);                                                      //add the class to the variable list (to become namespace)
+            Global.Classes.Add(c);                                                    //add the class to the variable list (to become namespace)
             ParseLocalVarDecl();                                                        //parse all the local variable declaration
             ParseSubDecls();                                                            //parse the sub declaration of all the other functions
             MatchWhile(new Token(TokenType.KEYWORD, "end"));
-            if (_currentClass.HasMethod("Main"))                                        //if there's a main class run it
+            _tokenCount += 2;
+            if (_currentClass.HasMethod("Main") && _currentClass.ClassName == "Program")                                        //if there's a main class run it
             {
-                _tokenCount = _currentClass.GetMethod("Main").MethodIndex;              //set the tokencount to the beginning of the main function
-                _currentMethod = _currentClass.GetMethod("Main");                       //set the current method to the main method
-                ParseStatements();                                                      //start the parsing process of main
+                ProgramStartIndex = _currentClass.GetMethod("Main").MethodIndex;
             }
         }
 
@@ -68,7 +83,8 @@ namespace Pan_Language
             Match(new Token(TokenType.OPERATOR, "<-"));                                             //make sure there is a <-
             ParseMethodParams(m);                                                                   //parse all the method parameters                                               //make sure there's an {
             m.MethodIndex = _tokenCount;                                                            //store the current tokencount in the method class for later use
-            MatchWhile(new Token(TokenType.KEYWORD, "end"));             
+            MatchWhile(new Token(TokenType.KEYWORD, "end"));
+            _tokenCount++;
             _currentClass.ClassMethods.Add(m);                                                      //add the method to the current class for later use
         }
 
@@ -146,7 +162,27 @@ namespace Pan_Language
 
         private void ParseInitStatement()
         {
-            throw new NotImplementedException();
+            Match(new Token(TokenType.KEYWORD, "init"));
+            if (PeekToken().Type != TokenType.IDENTIFIER)
+            {
+                throw new CompilerException("Not an identifier");
+            }
+            Token ident = NextToken();
+            Match(new Token(TokenType.OPERATOR, "<-"));
+            if (PeekToken().Type != TokenType.IDENTIFIER)
+            {
+                throw new CompilerException("Not a class identifier");
+            }
+            Token Class = NextToken();
+            try
+            {
+                Global.GetClass(Class.Value).instanceIDs.Add(ident.Value);
+                Console.WriteLine("INSTANCE CREATED");
+            }
+            catch
+            {
+                throw new CompilerException("Could not create instance of: " + Class.Value);
+            }
         }
 
         private void ParseInputStatement()
@@ -183,7 +219,14 @@ namespace Pan_Language
 
         private void ParseFunctionCall()
         {
+            Class c = _currentClass;
             Match(new Token(TokenType.KEYWORD, "exec"));                        //make sure there's an exec keyword
+            if (Global.GetClass(PeekToken().Value) != null)
+            {
+                Token className = NextToken();
+                c = Global.
+                Match(new Token(TokenType.SYMBOL, "."));
+            }
             Token functionName = NextToken();                                   //store the token for later use
             Console.WriteLine("Executing: " + functionName.Value);              //write to console what function it is executing
             Match(new Token(TokenType.SYMBOL, "("));                            //make sure the next token is a (
@@ -260,12 +303,23 @@ namespace Pan_Language
             {
                 Console.WriteLine("If is true");
                 ParseStatements();                              //parse everything in the if statement
+                Match(new Token(TokenType.KEYWORD, "end"));
             }
             else
             {
                 Console.WriteLine("If is false");
+                MatchWhile(new Token(TokenType.KEYWORD, "end"), new Token(TokenType.KEYWORD, "else"));
+                if (PeekToken().Value == "else")
+                {
+                    _tokenCount++;
+                    ParseStatements();
+                    Match(new Token(TokenType.KEYWORD, "end"));
+                }
+                else if (PeekToken().Value == "end")
+                {
+                    Match(new Token(TokenType.KEYWORD, "end"));
+                }
             }
-            MatchWhile(new Token(TokenType.KEYWORD, "end"));            //make sure there's a }
         }
 
         private void ParseWhileStatement()
@@ -514,21 +568,33 @@ namespace Pan_Language
             return false;
         }
 
-        private bool MatchWhile(Token T)
+        private bool MatchWhile(params Token[] T)
         {
+            bool found = false;
             try
             {
-                while (PeekToken().Value != T.Value)
+                while (true)
                 {
                     //Console.WriteLine("Searching for: {0} Got: {1}", T.Value, PeekToken().Value);
+                    foreach(Token t in T)
+                    {
+                        if (t.Value == PeekToken().Value)
+                        {
+                            found = true;
+                            break;                            
+                        }
+                    }
+                    if (found)
+                    {
+                        break;
+                    }
                     _tokenCount++;
                 }
-                _tokenCount++;
                 return true;
             }
             catch
             {
-                throw new CompilerException("Are you missing a " + T.Value);
+                throw new CompilerException("Correct token couldnt be found");
             }
         }
 

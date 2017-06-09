@@ -5,15 +5,17 @@ namespace Pan_Language
 {
     internal class Class
     {
-        private string ClassName { get; }
+        public string ClassName { get; }
         public List<Method> ClassMethods { get; }
         public Dictionary<string, Variable> ClassVars;
+        public List<string> instanceIDs;
 
         public Class(string className)
         {
             ClassName = className;
             ClassMethods = new List<Method>();
             ClassVars = new Dictionary<string, Variable>();
+            instanceIDs = new List<string>();
         }
 
         public bool HasMethod(string methodName)

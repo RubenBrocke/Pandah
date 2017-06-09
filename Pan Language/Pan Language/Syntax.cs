@@ -7,7 +7,7 @@ namespace Pan_Language
 
         private static readonly List<string> KeyWords = new List<string> { "if", "else", "function", "true", "false", "null", "this", "int", "string", "let", "class", "exec", "print", "void", "while", "input", "end", "init" };
         private static readonly List<char> Operators = new List<char> { '+', '-', '*', '/', '%', '<', '>', '=', '!', '&', '|', '?', ';' };
-        private static readonly List<char> Symbols = new List<char> { '{', '}', '(', ')', ':', ',' };
+        private static readonly List<char> Symbols = new List<char> { '{', '}', '(', ')', ':', ',', '.' };
 
         public static bool IsNumber(char input)
         {
