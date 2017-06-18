@@ -5,7 +5,7 @@ class Program
 		else
 			print "Succes!"
 			init me <- User
-			exec me.Test
+			exec me.Test()
 		end
 	end
 end

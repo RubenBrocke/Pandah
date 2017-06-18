@@ -219,23 +219,22 @@ namespace Pan_Language
 
         private void ParseFunctionCall()
         {
-            Class c = _currentClass;
+            Class className = _currentClass;
             Match(new Token(TokenType.KEYWORD, "exec"));                        //make sure there's an exec keyword
-            if (Global.GetClass(PeekToken().Value) != null)
+            if (Global.GetClassById(PeekToken().Value) != null)
             {
-                Token className = NextToken();
-                c = Global.
+                className = Global.GetClassById(NextToken().Value);               
                 Match(new Token(TokenType.SYMBOL, "."));
             }
             Token functionName = NextToken();                                   //store the token for later use
             Console.WriteLine("Executing: " + functionName.Value);              //write to console what function it is executing
             Match(new Token(TokenType.SYMBOL, "("));                            //make sure the next token is a (
-            ParseGivenParameters(_currentClass.GetMethod(functionName.Value));  //parse all the parameters that have been given
+            ParseGivenParameters(className.GetMethod(functionName.Value));      //parse all the parameters that have been given
             Match(new Token(TokenType.SYMBOL, ")"));                            //make sure the next token is a )
             returnStack.Push(_tokenCount);                                      //push the current tokencount in a stack
-            if (_currentClass.HasMethod(functionName.Value))                    //check to see if the method exists in the current class
+            if (className.HasMethod(functionName.Value))                    //check to see if the method exists in the current class
             {
-                Method m = _currentClass.GetMethod(functionName.Value);         //store the method in a variable for later use
+                Method m = className.GetMethod(functionName.Value);         //store the method in a variable for later use
                 _currentMethod = m;                                             //set the current method to the executing method
                 _tokenCount = m.MethodIndex;                                    //set the token count the beginning of the method                      
                 ParseStatements(); //TODO: parsesubbody                         //parse the statements in the function
@@ -245,7 +244,7 @@ namespace Pan_Language
                 throw new CompilerException("Function not existent");           //if there's no known function throw an error
             }
             _tokenCount = returnStack.Pop();                                    //return tho before you executed the function
-            _currentMethod = null;                                              //set the current method to null because we arent in one anymore FIXME: dont set it to null
+            _currentMethod = null;                                              //set the current method to null because we arent in one anymore FIXME: dont set it to null set it to the one you return to
         }
 
         private void ParseGivenParameters(Method m)
@@ -602,7 +601,7 @@ namespace Pan_Language
         {
             if (PeekToken().Value != T.Value || PeekToken().Type != T.Type)
             {
-                throw new CompilerException("Expected: " + T.Value + " Got: " + PeekToken().Value);
+               throw new CompilerException("Expected: " + T.Value + " Got: " + PeekToken().Value);
             }
             _tokenCount++;
             return true;
