@@ -1,3 +1,8 @@
+Welcome dear reader to the github page of my programming language: Pandah
+Pandah aspires to be a keyword based language that is easilly explainable
+You can read up on how it works below!
+
+
 --Documentation for the Pandah language--
 
 Chapter 1. Hello World
@@ -84,6 +89,13 @@ The exec keyword is used when one wants to execute a function and is used like t
 	
 FUNCTION is the indentifier of the function you want to call
 Function parameters are to be put inbetween the braces
+
+Alternatively you could call a function on an instance you just created (See: Init keyword)
+Doing this will execute the function in that instance and looks like this:
+
+	exec INSTANCE.FUNCTION()
+
+INSTANCE is the instance you created
 
 **Init keyword**
 The init keyword is used to create another instance of a class and is used like this:
