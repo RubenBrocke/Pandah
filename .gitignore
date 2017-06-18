@@ -69,3 +69,8 @@ Pan Language/Pan Language/bin/Output only/Pan Language.vshost.exe.manifest
 *.cache
 Pan Language/Pan Language/obj/Debug/Pan Language.csprojResolveAssemblyReference.cache
 Pan Language/.vs/Pan Language/v15/.suo
+*.suo
+Pan Language/Pan Language/bin/Debug/Pan Language.exe
+*.pdb
+Pan Language/Pan Language/obj/Debug/Pan Language.exe
+*.pdb
