@@ -9,4 +9,3 @@ C:\Users\Ruben\Documents\GitHub\Pandah\Pan Language\Pan Language\obj\Debug\Pan L
 C:\Users\Ruben\Documents\GitHub\Pandah\Pan Language\Pan Language\obj\Debug\Pan Language.pdb
 C:\Users\Ruben\Documents\GitHub\Pandah\Pan Language\Pan Language\bin\Debug\Pan Language.exe
 C:\Users\Ruben\Documents\GitHub\Pandah\Pan Language\Pan Language\bin\Debug\Pan Language.pdb
-C:\Users\Ruben\Documents\GitHub\Pandah\Pan Language\Pan Language\obj\Debug\Pan Language.csprojResolveAssemblyReference.cache

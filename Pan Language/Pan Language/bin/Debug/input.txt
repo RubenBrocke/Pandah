@@ -1,17 +1,14 @@
 class Program
 	function Main <- void
-		if (false)
-			print "FAILED"
-		else
-			print "Succes!"
-			init me <- User
-			exec me.Test()
-		end
+		print	"This"
+		print	"is"
+		print	"how"
+		print	"i"
+		print	"want"
+		print	"it"
+		print	"to"
+		print	"look"	
+		let		variable <- 6
+		print	variable + 8			
 	end
-end
-
-class User
-	function Test <- void
-		print "TEST"
-	end	
 end
