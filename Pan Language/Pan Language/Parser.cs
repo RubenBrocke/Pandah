@@ -12,7 +12,7 @@ namespace Pan_Language
         private Class _currentClass;                    //The class the parser is currently in cannot be null
         private Method _currentMethod;                  //The method the parser is currently in can be null
         private Stack<int> returnStack;                 //the stack that holds where the praser should go after a series of function calls
-        private int ProgramStartIndex;                  //the token where the program should start (class = program method = main)
+        private int _programStartIndex;                  //the token where the program should start (class = program method = main)
 
         public Parser(List<Token> tokens, CodeGenerator codeGenerator)
         {
@@ -33,7 +33,7 @@ namespace Pan_Language
                     break;
                 }
             }
-            _tokenCount = ProgramStartIndex;                                        //set the tokencount to the beginning of the main function
+            _tokenCount = _programStartIndex;                                        //set the tokencount to the beginning of the main function
             _currentMethod = _currentClass.GetMethod("Main");                       //set the current method to the main method
             ParseStatements();                                                      //start the parsing process of main
         }
@@ -53,23 +53,32 @@ namespace Pan_Language
             Class c = new Class(classIdentifier.Value);                                 //create a new class based on the class token
             _currentClass = c;                                                          //set it as the current class
             Global.Classes.Add(c);                                                    //add the class to the variable list (to become namespace)
-            ParseLocalVarDecl();                                                        //parse all the local variable declaration
+            ParseLocalVarDecl();                                                        //parse all the local variable declaration            
             ParseSubDecls();                                                            //parse the sub declaration of all the other functions
             MatchWhile(new Token(TokenType.KEYWORD, "end"));
-            _tokenCount += 2;
+            _tokenCount++;
             if (_currentClass.HasMethod("Main") && _currentClass.ClassName == "Program")                                        //if there's a main class run it
             {
-                ProgramStartIndex = _currentClass.GetMethod("Main").MethodIndex;
+                _programStartIndex = _currentClass.GetMethod("Main").MethodIndex;
             }
         }
 
         private void ParseSubDecls()
         {
-            while (IsNextSubDecl())     //Check if the next token is a sub declaration token (eg. function)
+            while (IsNextSubDecl())     //Check if the next token is a sub declaration token (eg. function) or a constructor
             {
-                ParseFunctionDecl();    //It is so parse the sub routine
+                switch (PeekToken().Value)
+                {
+                    case "function":
+                        ParseFunctionDecl(); //It is a function so parse the sub routine
+                        break;
+                    case "constructor":
+                        ParseConstructorDecl(); //It's a constuctor so parse that
+                        break;
+                }
             }
         }
+
 
         private void ParseFunctionDecl()
         {
@@ -86,6 +95,22 @@ namespace Pan_Language
             MatchWhile(new Token(TokenType.KEYWORD, "end"));
             _tokenCount++;
             _currentClass.ClassMethods.Add(m);                                                      //add the method to the current class for later use
+        }
+
+        private void ParseConstructorDecl()
+        {
+            Token constructorToken = NextToken();
+            if (PeekToken().Type != TokenType.OPERATOR && PeekToken().Value != "<-")
+            {
+                throw new CompilerException("Expected <- after constructor keyword");
+            }
+            Method m = new Method("constructor", _tokenCount);
+            Match(new Token(TokenType.OPERATOR, "<-"));
+            ParseMethodParams(m);
+            m.MethodIndex = _tokenCount;
+            MatchWhile(new Token(TokenType.KEYWORD, "end"));
+            _tokenCount++;
+            _currentClass.ClassMethods.Add(m);
         }
 
         private void ParseMethodParams(Method m)
@@ -174,14 +199,37 @@ namespace Pan_Language
                 throw new CompilerException("Not a class identifier");
             }
             Token Class = NextToken();
+            Class c;
             try
             {
-                Global.GetClass(Class.Value).instanceIDs.Add(ident.Value);
+                c = Global.GetClass(Class.Value);
+                c.instanceIDs.Add(ident.Value);
                 Console.WriteLine("INSTANCE CREATED");
             }
             catch
             {
                 throw new CompilerException("Could not create instance of: " + Class.Value);
+            }
+            if (PeekToken().Type == TokenType.SYMBOL && PeekToken().Value == "(")
+            {
+                Method m = c.GetMethod("constructor");
+                Match(new Token(TokenType.SYMBOL, "("));
+                ParseGivenParameters(m);
+                Match(new Token(TokenType.SYMBOL, ")"));
+                returnStack.Push(_tokenCount);
+                if (c.HasMethod("constructor"))
+                {
+                    Method method = c.GetMethod("constructor");
+                    _currentMethod = method;
+                    _tokenCount = method.MethodIndex;
+                    ParseStatements(); //TODO: parsesubbody                         //parse the statements in the function
+                }
+                else
+                {
+                    throw new CompilerException("constructor not existent");
+                }
+                _tokenCount = returnStack.Pop();
+                _currentMethod = null;
             }
         }
 
@@ -223,7 +271,7 @@ namespace Pan_Language
             Match(new Token(TokenType.KEYWORD, "exec"));                        //make sure there's an exec keyword
             if (Global.GetClassById(PeekToken().Value) != null)
             {
-                className = Global.GetClassById(NextToken().Value);               
+                className = Global.GetClassById(NextToken().Value);
                 Match(new Token(TokenType.SYMBOL, "."));
             }
             Token functionName = NextToken();                                   //store the token for later use
@@ -329,7 +377,7 @@ namespace Pan_Language
             ParseExpression();                                  //parse the while expression
             Match(new Token(TokenType.SYMBOL, ")"));            //make sure there's a )
             //Match(new Token(TokenType.SYMBOL, "{"));            //make sure there's a {
-            while(Convert.ToBoolean(_codeGenerator.STACK.Pop()))//keep the while loop going as long as there's true on top of the stack
+            while (Convert.ToBoolean(_codeGenerator.STACK.Pop()))//keep the while loop going as long as there's true on top of the stack
             {
                 ParseStatements();                              //parse the statment in the while loop
                 _tokenCount = returnCount;                      //set the tokencount back to the expression in the while loop
@@ -403,7 +451,7 @@ namespace Pan_Language
                 Token addOp = NextToken();      //store the operator for later use
                 ParseMulExpression();           //parse the multiplicative expression after the operator
                 switch (addOp.Value)            //switch the additive operator value
-                {   
+                {
                     case "+":                   //in case of +
                         _codeGenerator.Add();   //tell the code gen there's an add operator
                         break;
@@ -455,14 +503,14 @@ namespace Pan_Language
                     break;
                 case TokenType.IDENTIFIER:
                     Token ident = NextToken();                                          //in case of an identifier
-                     _codeGenerator.VariableRead(ident, _currentClass, _currentMethod); //tell the code gen to read the variable
+                    _codeGenerator.VariableRead(ident, _currentClass, _currentMethod); //tell the code gen to read the variable
                     break;
                 default:                                                //if its neither of those 2 (its more complicated after this)
                     if (IsNextKeywordConst())                           //is the next token a keyword constant (eg. false)
-                    {   
+                    {
                         Token keywordConst = NextToken();               //store the keyword constant
                         switch (keywordConst.Value)
-                        {           
+                        {
                             case "true":                                //in case of true
                                 _codeGenerator.True();                  //tell the code gen there'a a true
                                 break;
@@ -478,7 +526,7 @@ namespace Pan_Language
                             default:
                                 throw new CompilerException("keywordconst not found");  //throw an error if the keyword is not in the switch statement
                         }
-                    }                    
+                    }
                     else if (PeekToken().Value == "(")                  //if the next token is a (
                     {
                         Match(new Token(TokenType.OPERATOR, "("));      //make sure there's a ( (principle reasons)
@@ -507,10 +555,10 @@ namespace Pan_Language
 
         private Token PeekToken() => _parseTokens[_tokenCount + 1];     //returns the next token from the tokenlist without incrementing the tokencounter
 
-        private bool IsNextKeywordConst()   
+        private bool IsNextKeywordConst()
         {
             return PeekToken().Type == TokenType.KEYWORD &&
-                   new[] {"true", "false", "null", "this"}.Contains(PeekToken().Value);
+                   new[] { "true", "false", "null", "this" }.Contains(PeekToken().Value);
         }
 
         private bool IsNextTypeSymbol()
@@ -523,34 +571,34 @@ namespace Pan_Language
         private bool IsNextTypeOrClass()
         {
             if (PeekToken().Type == TokenType.KEYWORD || PeekToken().Type == TokenType.IDENTIFIER)
-                return new[] {"int", "string"}.Contains(PeekToken().Value);
+                return new[] { "int", "string" }.Contains(PeekToken().Value);
             return false;
         }
 
         private bool IsNextTokenUnaryOp()
         {
-            return PeekToken().Type == TokenType.OPERATOR && new[] {"-", "!"}.Contains(PeekToken().Value);
+            return PeekToken().Type == TokenType.OPERATOR && new[] { "-", "!" }.Contains(PeekToken().Value);
         }
 
         private bool IsNextMulOp()
         {
-            return PeekToken().Type == TokenType.OPERATOR && new[] {"*", "/", "%"}.Contains(PeekToken().Value);
+            return PeekToken().Type == TokenType.OPERATOR && new[] { "*", "/", "%" }.Contains(PeekToken().Value);
         }
 
         private bool IsNextAddOp()
         {
-            return PeekToken().Type == TokenType.OPERATOR && new[] {"+", "-"}.Contains(PeekToken().Value);
+            return PeekToken().Type == TokenType.OPERATOR && new[] { "+", "-" }.Contains(PeekToken().Value);
         }
 
         private bool IsNextRelOp()
         {
             return PeekToken().Type == TokenType.OPERATOR &&
-                   new[] {"<", ">", "?", "<=", ">=", "!="}.Contains(PeekToken().Value);
+                   new[] { "<", ">", "?", "<=", ">=", "!=" }.Contains(PeekToken().Value);
         }
 
         private bool IsNextLogicalOp()
         {
-            return PeekToken().Type == TokenType.OPERATOR && new[] {"&", "|"}.Contains(PeekToken().Value);
+            return PeekToken().Type == TokenType.OPERATOR && new[] { "&", "|" }.Contains(PeekToken().Value);
         }
 
         private bool IsNextVarDecl()
@@ -563,7 +611,7 @@ namespace Pan_Language
         private bool IsNextSubDecl()
         {
             if (PeekToken().Type == TokenType.KEYWORD)
-                return PeekToken().Value == "function";
+                return PeekToken().Value == "function" || PeekToken().Value == "constructor";
             return false;
         }
 
@@ -575,12 +623,12 @@ namespace Pan_Language
                 while (true)
                 {
                     //Console.WriteLine("Searching for: {0} Got: {1}", T.Value, PeekToken().Value);
-                    foreach(Token t in T)
+                    foreach (Token t in T)
                     {
                         if (t.Value == PeekToken().Value)
                         {
                             found = true;
-                            break;                            
+                            break;
                         }
                     }
                     if (found)
@@ -601,7 +649,7 @@ namespace Pan_Language
         {
             if (PeekToken().Value != T.Value || PeekToken().Type != T.Type)
             {
-               throw new CompilerException("Expected: " + T.Value + " Got: " + PeekToken().Value);
+                throw new CompilerException("Expected: " + T.Value + " Got: " + PeekToken().Value);
             }
             _tokenCount++;
             return true;

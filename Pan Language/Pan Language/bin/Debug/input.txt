@@ -1,14 +1,11 @@
 class Program
 	function Main <- void
-		print	"This"
-		print	"is"
-		print	"how"
-		print	"i"
-		print	"want"
-		print	"it"
-		print	"to"
-		print	"look"	
-		let		variable <- 6
-		print	variable + 8			
+		init person <- Person()	
+	end
+end
+
+class Person
+	constructor <- void
+		print "CONSTRUCTOR CALLED"
 	end
 end
