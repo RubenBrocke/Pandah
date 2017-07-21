@@ -115,11 +115,7 @@ namespace Pan_Language
 
         private void ParseMethodParams(Method m)
         {
-            if (PeekToken().Value == ";")                                                           //check if parameters have been given
-            {
-                throw new CompilerException("No parameters in function. Use Void");                 //if no parameters have been found tell the user to use void
-            }
-            while (PeekToken().Value != ";")                                                        //keep parsing the parameters until there's an ;
+            while (PeekToken().Type == TokenType.IDENTIFIER || PeekToken().Value == "void")                                                        //keep parsing the parameters until there's an ;
             {
                 Token idToken = NextToken();                                                        //store the identifier token 
                 if (idToken.Type != TokenType.IDENTIFIER)                                           //make sure the token is an identifier
@@ -157,7 +153,7 @@ namespace Pan_Language
             Token peekToken = PeekToken();                                                  //store the token for later use
             if (peekToken.Type != TokenType.KEYWORD)                                        //make sure it an identifier
             {
-                throw new CompilerException("KEYWORD expected, got: " + peekToken.Value);   //its not an identifer. throw an error to let the user know
+                throw new CompilerException("KEYWORD expected. got: " + peekToken.Value);   //its not an identifer. throw an error to let the user know
             }
             switch (peekToken.Value)                                                        //check the token for the different possibilities
             {
@@ -312,19 +308,33 @@ namespace Pan_Language
 
         private void ParseLetStatement()
         {
+            bool isArray = false;
             Match(new Token(TokenType.KEYWORD, "let"));                                             //make sure there's a let keyword
             if (PeekToken().Type != TokenType.IDENTIFIER)                                           //make sure the next token is an identifier
             {
                 throw new CompilerException("Identifier expected got: " + PeekToken().Value);       //if not throw an error to let the user know
             }
             Token varName = NextToken();                                                            //store the identifier token for later use
+            if (PeekToken().Type == TokenType.SYMBOL && PeekToken().Value == "[")
+            {
+                Match(new Token(TokenType.SYMBOL, "["));
+                Match(new Token(TokenType.SYMBOL, "]"));
+                isArray = true;
+            }
             if (_currentClass.HasVariable(varName.Value))                                           //Check if variable exists as class var
             {
                 throw new CompilerException("This class already contains the variable: " + varName.Value);                                                                                    //It is a class variable do nothing
             }
             else if (_currentMethod != null)                                                        //Check if we're in a method
             {
-                if (!_currentMethod.HasVariable(varName.Value))                                     //check if the current method has the variable
+                if (isArray)
+                {
+                    if (!_currentMethod.HasArray(varName.Value))
+                    {
+                        _currentMethod.MethodArrays.Add(varName.Value, new List<Variable>());
+                    }
+                }
+                else if (!_currentMethod.HasVariable(varName.Value))                                     //check if the current method has the variable
                 {
                     _currentMethod.MethodVars.Add(varName.Value, new Variable(null));               //there's no variable in the currentclass nor in the method. we should add it
                 }
@@ -334,8 +344,27 @@ namespace Pan_Language
                 _currentClass.ClassVars.Add(varName.Value, new Variable(null));                     //we're not in a method and its not a class variable. we should add it
             }
             Match(new Token(TokenType.OPERATOR, "<-"));                                             //make sure there's a <- 
-            ParseExpression();                                                                      //parse the expression after the <-
-            _codeGenerator.Assign(varName, _currentClass, _currentMethod);                          //assign the result to the variable                                         //make sure there's a ;
+            if (isArray)
+            {
+                Match(new Token(TokenType.SYMBOL, "["));
+                int arrayIndex = 0;
+                while (PeekToken().Type != TokenType.SYMBOL && PeekToken().Value != "]")
+                {
+                    ParseExpression();
+                    _currentMethod.GetArray(varName.Value).Add(new Variable(null));
+                    _codeGenerator.Assign(varName, _currentClass, _currentMethod, arrayIndex++);
+                    if (PeekToken().Value != "]")
+                    {
+                        Match(new Token(TokenType.SYMBOL, ","));
+                    }
+                }
+                Match(new Token(TokenType.SYMBOL, "]"));
+            }
+            else
+            {
+                ParseExpression();                                                                      //parse the expression after the <-
+                _codeGenerator.Assign(varName, _currentClass, _currentMethod);                          //assign the result to the variable  
+            }
         }
 
         private void ParseIfStatement()

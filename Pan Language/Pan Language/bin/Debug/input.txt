@@ -1,11 +1,5 @@
 class Program
 	function Main <- void
-		init person <- Person()	
-	end
-end
-
-class Person
-	constructor <- void
-		print "CONSTRUCTOR CALLED"
+		let array[] <- [5,5,4]	
 	end
 end

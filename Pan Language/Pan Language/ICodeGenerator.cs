@@ -6,7 +6,7 @@
         void BeginIf();
         void PossibleElse();
         void EndIf();
-        void Assign(Token varName, Class c, Method m = null);
+        void Assign(Token varName, Class c, Method m = null, int arrayindex = -1);
         void Add();
         void Sub();
         void Mul();

@@ -201,23 +201,47 @@ namespace Pan_Language
         {
             Console.WriteLine("End If");
         }
-        public void Assign(Token varName, Class c, Method m = null)
+        public void Assign(Token varName, Class c, Method m = null, int arrayIndex = -1)
         {
-            //Check if its a method variable
-            if (m != null && m.HasVariable(varName.Value))
+            if (arrayIndex != -1)
             {
-                Variable v = m.GetVariable(varName.Value);
-                m.SetVariable(v, STACK.Pop());
-            }
-            //Check if its a class variable
-            else if (c.HasVariable(varName.Value))
-            {
-                Variable v = c.GetVariable(varName.Value);
-                c.SetVariable(v, STACK.Pop());
+                //Its an array
+                //Check if its a method array
+                if (m != null && m.HasArray(varName.Value))
+                {
+                    Variable v = m.GetArrayVariable(varName.Value, arrayIndex);
+                    m.SetArrayVariable(v, arrayIndex, STACK.Pop());
+                }
+                //Check if its a class array
+                else if (c.HasVariable(varName.Value))
+                {
+                    Variable v = c.GetVariable(varName.Value);
+                    c.SetVariable(v, STACK.Pop());
+                }
+                else
+                {
+                    throw new CompilerException("Variable does not exist");
+                }
             }
             else
             {
-                throw new CompilerException("Variable does not exist");
+                //Its not an array
+                //Check if its a method variable
+                if (m != null && m.HasVariable(varName.Value))
+                {
+                    Variable v = m.GetVariable(varName.Value);
+                    m.SetVariable(v, STACK.Pop());
+                }
+                //Check if its a class variable
+                else if (c.HasVariable(varName.Value))
+                {
+                    Variable v = c.GetVariable(varName.Value);
+                    c.SetVariable(v, STACK.Pop());
+                }
+                else
+                {
+                    throw new CompilerException("Variable does not exist");
+                }
             }
         }
         public void Call(string className, string subroutineName) => Console.WriteLine("Function Call");  
